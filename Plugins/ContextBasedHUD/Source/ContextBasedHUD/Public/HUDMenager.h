@@ -17,7 +17,7 @@ class CONTEXTBASEDHUD_API AHUDMenager : public AHUD
 	// Main Context Functions
 
 	UFUNCTION(BlueprintCallable)
-	void ShowWidget(const TSubclassOf<UUserWidget> WidgetClass, const bool bHideHUD, const bool bHideStack, const bool bClearStack, UObject* ContextObject, UUserWidget*& OutWidget);
+	void ShowWidget(const TSubclassOf<UUserWidget> WidgetClass, const bool bHideStack, const bool bClearStack, UObject* ContextObject, UUserWidget*& OutWidget);
 
 	UFUNCTION(BlueprintCallable)
 	void ClearStack();
@@ -60,11 +60,17 @@ class CONTEXTBASEDHUD_API AHUDMenager : public AHUD
 	TSubclassOf<UUserWidget> GetCurrentWidgetClass() const { return CurrentWidgetClass; }
 
 	UFUNCTION(BlueprintPure)
-	bool FindWidgetInContext(const TSubclassOf<UUserWidget> WidgetClass, TMap<TSubclassOf<UUserWidget>, UUserWidget*> Context, UUserWidget*& OutWidget);\
+	bool FindWidgetInContext(const TSubclassOf<UUserWidget> WidgetClass, TMap<TSubclassOf<UUserWidget>, UUserWidget*> Context, UUserWidget*& OutWidget);
+
+	UFUNCTION(BlueprintGetter, BlueprintPure, Category = "HUD Context")
+	bool GetHUDState() const { return HUDState; }
 
 private:
 
 	// Contexts properties
+
+	UPROPERTY(BlueprintGetter = "GetHUDState")
+	bool HUDState;
 
 	UPROPERTY(BlueprintGetter = "GetHUDContext")
 	TMap<TSubclassOf<UUserWidget>, UUserWidget*> HUDContext;

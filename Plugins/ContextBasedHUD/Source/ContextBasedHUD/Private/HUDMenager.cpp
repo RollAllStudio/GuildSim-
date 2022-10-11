@@ -4,23 +4,20 @@
 #include "Blueprint/UserWidget.h"
 #include "../Public/ContextBaseHUDInterface.h"
 
-void AHUDMenager::ShowWidget(const TSubclassOf<UUserWidget> WidgetClass, const bool bHideHUD, const bool bHideStack, const bool bClearStack, UObject* ContextObject, UUserWidget*& OutWidget)
+void AHUDMenager::ShowWidget(const TSubclassOf<UUserWidget> WidgetClass, const bool bHideStack, const bool bClearStack, UObject* ContextObject, UUserWidget*& OutWidget)
 {
 	if (WidgetsStack.Num() == 0)
 	{
 		ToggleHUDContext(false);
 	}
 
-	if (bHideHUD)
-	{
-		ToggleHUDContext(false);
-	}
 	if (bClearStack)
 	{
 		IsClearingStack = true;
 		ClearStack();
 		IsClearingStack = false;
 	}
+
 	if (bHideStack)
 	{
 		HideStack();
@@ -69,7 +66,7 @@ void AHUDMenager::RemoveCurrentWidget()
 
 	WidgetsStack.Remove(GetCurrentWidget());
 
-	if (WidgetsStack.Num() > 0)
+	if (WidgetsStack.Num() > 0 && !IsClearingStack)
 	{
 		CurrentWidget = WidgetsStack.Last();
 		CurrentWidgetClass = CurrentWidget->GetClass();
@@ -100,25 +97,23 @@ void AHUDMenager::HideStack()
 
 void AHUDMenager::ToggleHUDContext(const bool InputValue)
 {
-	if (InputValue == ShouldShowHUD())
+	
+	TArray<TSubclassOf<UUserWidget>> KeysArray;
+	HUDContext.GetKeys(KeysArray);
+
+	for (int i = 0; i < KeysArray.Num(); i++)
 	{
-		TArray<TSubclassOf<UUserWidget>> KeysArray;
-		HUDContext.GetKeys(KeysArray);
+		UUserWidget* LocalWidget = nullptr;
 
-		for (int i = 0; i < KeysArray.Num(); i++)
+		if (FindWidgetInContext(KeysArray[i], HUDContext, LocalWidget))
 		{
-			UUserWidget* LocalWidget = nullptr;
-
-			if (FindWidgetInContext(CurrentWidgetClass, HUDContext, LocalWidget))
+			if (!LocalWidget->IsInViewport() && InputValue)
 			{
-				if (!LocalWidget->IsInViewport() && InputValue)
-				{
-					LocalWidget->AddToViewport();
-				}
-				if (LocalWidget->IsInViewport() && !InputValue)
-				{
-					LocalWidget->RemoveFromViewport();
-				}
+				LocalWidget->AddToViewport();
+			}
+			if (LocalWidget->IsInViewport() && !InputValue)
+			{
+				LocalWidget->RemoveFromViewport();
 			}
 		}
 	}

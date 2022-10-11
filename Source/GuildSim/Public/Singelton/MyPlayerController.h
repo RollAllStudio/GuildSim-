@@ -7,6 +7,7 @@
 #include "MyPlayerController.generated.h"
 
 class AHUDMenager;
+class UPlayerInteractionComponent;
 
 /**
  * 
@@ -23,10 +24,16 @@ public:
 	UFUNCTION(BlueprintGetter, BlueprintPure)
 	AHUDMenager* GetMyHudMenager();
 
+	UFUNCTION(BlueprintGetter, BlueprintPure)
+	UPlayerInteractionComponent* GetInteractionComponent() { return PlayerInteractionComponent; }
+
 private:
 
 	UPROPERTY(BlueprintGetter = "GetMyHudMenager")
 	AHUDMenager* MyHudMenager;
+
+	UPROPERTY(BlueprintGetter = "GetInteractionComponent")
+	UPlayerInteractionComponent* PlayerInteractionComponent;
 
 protected:
 

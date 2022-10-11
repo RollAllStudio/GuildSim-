@@ -6,21 +6,33 @@
 // Sets default values for this component's properties
 UPlayerInteractionComponent::UPlayerInteractionComponent()
 {
-	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
-	// off to improve performance if you don't need them.
-	PrimaryComponentTick.bCanEverTick = true;
-
-	// ...
+	PrimaryComponentTick.bCanEverTick = false;
 }
 
+
+void UPlayerInteractionComponent::Init(APlayerController* OwningPlayerController)
+{
+	PlayerController = OwningPlayerController;
+	PrimaryComponentTick.bCanEverTick = true;
+}
+
+void UPlayerInteractionComponent::ProcedeCurrentTracedActor()
+{
+	CurrentTracedActor = CachedMouseHitResult.GetActor();
+	OnHoveredNewActor.Broadcast(CurrentTracedActor);
+	ProcedeCurrentTracedComponent();
+}
+
+void UPlayerInteractionComponent::ProcedeCurrentTracedComponent()
+{
+	CurrentTracedComponent = CachedMouseHitResult.GetComponent();
+	OnHoveredNewComponent.Broadcast(CurrentTracedComponent);
+}
 
 // Called when the game starts
 void UPlayerInteractionComponent::BeginPlay()
 {
 	Super::BeginPlay();
-
-	// ...
-	
 }
 
 
@@ -29,6 +41,25 @@ void UPlayerInteractionComponent::TickComponent(float DeltaTime, ELevelTick Tick
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	// ...
+	FHitResult TempHitResult;
+	PlayerController->GetHitResultUnderCursor(ECC_Visibility, true, TempHitResult);
+
+	if (TempHitResult.GetActor() != CachedMouseHitResult.GetActor())
+	{
+		if (CurrentTracedActor)
+		{
+			OnActorUnhovered.Broadcast(CurrentTracedActor);
+			OnUnhoverComponent.Broadcast(CurrentTracedComponent);
+		}
+		CachedMouseHitResult = TempHitResult;
+		ProcedeCurrentTracedActor();
+		ProcedeCurrentTracedComponent();
+	}
+	else if (TempHitResult.GetComponent() != CachedMouseHitResult.GetComponent())
+	{
+		OnUnhoverComponent.Broadcast(CurrentTracedComponent);
+		CachedMouseHitResult = TempHitResult;
+		ProcedeCurrentTracedComponent();
+	}
 }
 
