@@ -4,8 +4,6 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
-#include "Delegates/DelegateCombinations.h"
-#include "GameFramework/PlayerController.h"
 #include "PlayerInteractionComponent.generated.h"
 
 class UPrimitiveComponent;

@@ -3,6 +3,7 @@
 
 #include "GuildSim/Tests/TestActor.h"
 #include "Kismet/GameplayStatics.h"
+#include "Engine/Engine.h"
 #include "GuildSim/Public/Singelton/MyPlayerController.h"
 
 // Sets default values
@@ -38,13 +39,20 @@ bool ATestActor::GetCanInteract_Implementation()
 	AMyPlayerController* MyPlayerController = Cast<AMyPlayerController>(UGameplayStatics::GetPlayerController(this, 0));
 	if (MyPlayerController)
 	{
-	
+		if (MyPlayerController->GetInteractionPressedTime() < 0.5f)
+		{
+			return true;
+		}
 	}
 	return false;
 }
 
 bool ATestActor::Interact_Implementation()
 {
+	if (GEngine)
+	{
+		GEngine->AddOnScreenDebugMessage(0, 5.0f, FColor(255, 0, 0 , 255), "Ineraktuje");
+	}
 	return false;
 }
 

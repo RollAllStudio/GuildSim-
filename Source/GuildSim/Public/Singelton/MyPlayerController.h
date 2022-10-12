@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "InteractionInterface.h"
 #include "GameFramework/PlayerController.h"
 #include "MyPlayerController.generated.h"
 
@@ -25,7 +26,21 @@ public:
 	AHUDMenager* GetMyHudMenager();
 
 	UFUNCTION(BlueprintGetter, BlueprintPure)
-	UPlayerInteractionComponent* GetInteractionComponent() { return PlayerInteractionComponent; }
+	UPlayerInteractionComponent* GetInteractionComponent() const { return PlayerInteractionComponent; }
+
+	virtual void Tick(float DeltaTime) override;
+
+	UFUNCTION(BlueprintPure)
+	UPrimitiveComponent* GetCurrentTracedComponent() const;
+
+	UFUNCTION(BlueprintPure)
+	AActor* GetCurrentTracedActor() const;
+
+	UFUNCTION(BlueprintPure)
+	UObject* GetCurrentInteractionObject() const;
+
+	UFUNCTION(BlueprintGetter, BlueprintPure)
+	float GetInteractionPressedTime() const {return InteractionPressedTime;}
 
 private:
 
@@ -34,6 +49,15 @@ private:
 
 	UPROPERTY(BlueprintGetter = "GetInteractionComponent")
 	UPlayerInteractionComponent* PlayerInteractionComponent;
+
+	void OnInteractionPressed();
+	void OnInteractionReleased();
+
+	UPROPERTY()
+	bool bIsInteractionPressed;
+
+	UPROPERTY(BlueprintGetter = "GetInteractionPressedTime")
+	float InteractionPressedTime;
 
 protected:
 
